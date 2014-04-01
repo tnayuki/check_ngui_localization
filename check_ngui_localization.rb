@@ -17,17 +17,16 @@ File::open(ARGV[0]) { |f|
 
 errors = 0
 localization.each do |k, v|
-  v.each_char do |c|
-    next if c == "\n"
-
+  v.gsub(/[\p{C}\p{Zl}\p{Zp}]/, '').unpack("U*") do |c|
     l = 0
-    ttf.cmap.unicode.each do |u|
+
+    ttf.cmap.unicode.each { |u|
       begin
-        l = u[c.unpack("U*").first]
+        l = u[c]
         break unless l == 0
       rescue NotImplementedError
       end
-    end
+    }
 
     if l == 0 then
       STDERR.puts "The key '#{k}' is not displayable by the specified font"
